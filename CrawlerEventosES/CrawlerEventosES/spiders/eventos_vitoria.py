@@ -33,7 +33,7 @@ class EventosVitoriaSpider(scrapy.Spider):
                 }
     
         elif "lebillet.com.br" in response.url:
-            for evento in response.css('div.card-event'):  # Ajuste o seletor conforme a estrutura HTML
+            for evento in response.css('div.card-event'):  
                 yield {
                     'titulo': evento.css('h2.card-title::text').get(),
                     'data': evento.css('span.card-date::text').get(),
@@ -56,3 +56,14 @@ def executar_spider():
     process = CrawlerProcess()
     process.crawl(EventosVitoriaSpider)
     process.start()
+
+    
+
+def agendar_execucoes(intervalo):
+    while True:
+        executar_spider()
+        time.sleep(intervalo)
+
+
+if __name__ == "__main__":
+    agendar_execucoes(3600)
