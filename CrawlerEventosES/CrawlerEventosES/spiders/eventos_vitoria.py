@@ -12,4 +12,23 @@ class EventosVitoriaSpider(scrapy.Spider):
     ]
 
     def parse(self, response):
-        pass
+        
+        if "zig.tickets" in response.url:
+            for evento in response.css('div.event-card'):  
+                yield {
+                    'titulo': evento.css('h3.event-title::text').get(),
+                    'data': evento.css('span.event-date::text').get(),
+                    'local': evento.css('span.event-location::text').get(),
+                    'link': evento.css('a::attr(href)').get()
+                }
+
+        
+        elif "agazeta.com.br" in response.url:
+            for evento in response.css('div.event-card'): 
+                yield {
+                    'titulo': evento.css('h3.event-title::text').get(),
+                    'data': evento.css('span.event-date::text').get(),
+                    'local': evento.css('span.event-location::text').get(),
+                    'link': evento.css('a::attr(href)').get()
+                }
+    
