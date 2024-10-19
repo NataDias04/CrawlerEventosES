@@ -11,15 +11,18 @@ class EventosVitoriaSpider(scrapy.Spider):
         "https://lebillet.com.br",
     ]
 
+    
+
     def parse(self, response):
         
         if "zig.tickets" in response.url:
             for evento in response.css('div.event-card'):  
                 yield {
-                    'titulo': evento.css('h3.event-title::text').get(),
-                    'data': evento.css('span.event-date::text').get(),
-                    'local': evento.css('span.event-location::text').get(),
-                    'link': evento.css('a::attr(href)').get()
+                    'titulo': evento.css('h2::text').get().strip(),
+                    'data': evento.css('span.banner-date::text').get().strip(),
+                    'local': response.css('span.banner-place::text').get().strip(),
+                    'horario': response.css('span.banner-place::text').re_first(r'\d{2}:\d{2}').strip(),
+                    'classificacao': response.css('span.banner-place i.fa-user + ::text').get().strip()
                 }
 
         
