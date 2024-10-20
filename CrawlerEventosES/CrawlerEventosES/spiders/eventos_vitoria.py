@@ -1,6 +1,10 @@
 import scrapy
 import json
-import time
+
+from twisted.internet import reactor
+from twisted.internet.task import LoopingCall
+from scrapy.crawler import CrawlerRunner
+
 
 class EventosVitoriaSpider(scrapy.Spider):
     name = "eventos_vitoria"
@@ -47,18 +51,17 @@ def salvar_dados(dados, nome_arquivo='../eventos.json'):
 
 
 def executar_spider():
-    from scrapy.crawler import CrawlerProcess
-    process = CrawlerProcess()
-    process.crawl(EventosVitoriaSpider)
-    process.start()
-
-    
+    print("Iniciando execução da spider...")
+    runner = CrawlerRunner()
+    d = runner.crawl(EventosVitoriaSpider)
+    d.addBoth(lambda _: print("Spider finalizada."))
 
 def agendar_execucoes(intervalo):
-    while True:
-        executar_spider()
-        time.sleep(intervalo)
+    print(f"Agendando execução a cada 10 segundos...")
+    tarefa = LoopingCall(executar_spider)
+    tarefa.start(intervalo, now=True)
+    reactor.run()
 
 
 if __name__ == "__main__":
-    agendar_execucoes(3600)
+    agendar_execucoes(10)
