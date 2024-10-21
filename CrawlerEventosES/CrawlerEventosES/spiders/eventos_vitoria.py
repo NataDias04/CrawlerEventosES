@@ -10,15 +10,22 @@ class EventosVitoriaSpider(scrapy.Spider):
     name = "eventos_vitoria"
     #allowed_domains = ["lebillet.com.br"] #"agazeta.com.br", "zig.tickets"
 
-    start_urls = ["https://lebillet.com.br/"]
+    start_urls = ["https://lebillet.com.br/", "https://www.agazeta.com.br/hz/agenda-cultural"]
 
     
 
     def parse(self, response):
-
         dados = []
+        if "agazeta.com.br" in response.url:
+            for evento in response.css('article.box.box--imagem'):
+                titulo = evento.css('h2.titulo::text').get(default='N/A')
+
+                dados.append({
+                    'titulo': titulo,
+                })
+            salvar_dados(dados)
     
-        if "lebillet.com.br" in response.url:
+        elif "lebillet.com.br" in response.url:
             for evento in response.css('div.show-card.big'):
                 local_evento = evento.css('p.data-text.location::text').get(default='N/A')
         
@@ -31,11 +38,11 @@ class EventosVitoriaSpider(scrapy.Spider):
                         'link': evento.css('a::attr(href)').get(default='N/A')
                     })
 
+            salvar_dados(dados)
+
             next_page = response.css('a.next::attr(href)').get()
             if next_page is not None:
                 yield response.follow(next_page, self.parse)
-
-            salvar_dados(dados)
 
 locais = ["Vitória, ES", "Vila Velha, ES","A Definir ES, ES","Serra, ES", "Colatina, ES"]
 
