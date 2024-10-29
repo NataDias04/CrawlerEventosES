@@ -108,4 +108,4 @@ def agendar_execucoes(intervalo):
     reactor.run()
 
 if __name__ == "_main_":
-    agendar_execucoes(3600)
+    agendar_execucoes(10)
